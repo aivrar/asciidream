@@ -1,5 +1,7 @@
 # Asciidream
 
+![Asciidream](screenshots/00-hero.png)
+
 > ASCII / Unicode generative art studio — runs as one portable Windows .exe. Drop a photo to convert it to ASCII, or pick from 35+ algorithmic patterns. Offline-first. Deterministic. No telemetry. No accounts.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
