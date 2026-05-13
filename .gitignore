@@ -1,0 +1,57 @@
+# PyInstaller artifacts
+build/
+dist/
+*.spec
+*.spec.bak
+
+# Node (only used to regenerate screenshots; not required for users)
+node_modules/
+
+# Playwright MCP scratch
+.playwright-mcp/
+
+# Local dev junk
+_check.js
+_test.gif
+_dino*.png
+_dino*.txt
+asciidream-*.png
+asciidream-*.svg
+asciidream-*.txt
+asciidream-*.gif
+asciidream-*.glyph
+asciidream-*.html
+asciidream-*.md
+asciidream-*.json
+audit-*.png
+welcome-*.png
+fresh-*.png
+right-panel*.png
+left-panel*.png
+topbar-*.png
+inspector-*.png
+coach-*.png
+final-*.png
+real-flow.png
+image-*.png
+after-image-drop.png
+dino-*.png
+
+# Build logs / flags
+build.log
+dist_ready.flag
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store

@@ -1,0 +1,16 @@
+{
+  "name": "asciidream",
+  "version": "1.0.0",
+  "description": "> ASCII / Unicode generative art studio — runs as one portable Windows .exe. Drop a photo to convert it to ASCII, or pick from 35+ algorithmic patterns. Offline-first. Deterministic. No telemetry. No accounts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}
