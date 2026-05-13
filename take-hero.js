@@ -1,5 +1,5 @@
-/* Generate a single hero shot for the README front page.
-   Wider aspect ratio, dramatic content, full window with the app's chrome. */
+/* Hero: full canvas only, no UI chrome.
+   Big resolution, dense charset, vibrant palette, dramatic generator. */
 
 const fs = require('fs');
 const path = require('path');
@@ -10,7 +10,7 @@ const ROOT = path.resolve(__dirname);
 const OUT  = path.join(ROOT, 'screenshots');
 fs.mkdirSync(OUT, { recursive: true });
 
-const PORT = 8757;
+const PORT = 8758;
 const MIME = { '.html':'text/html', '.png':'image/png', '.jpg':'image/jpeg' };
 function startServer(){
   return new Promise(resolve => {
@@ -18,9 +18,7 @@ function startServer(){
       let url = req.url.split('?')[0];
       if (url === '/') url = '/asciidream.html';
       const f = path.join(ROOT, url);
-      if (!fs.existsSync(f) || fs.statSync(f).isDirectory()){
-        res.writeHead(404); res.end('not found'); return;
-      }
+      if (!fs.existsSync(f) || fs.statSync(f).isDirectory()){ res.writeHead(404); res.end(); return; }
       const ext = path.extname(f).toLowerCase();
       res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
       fs.createReadStream(f).pipe(res);
@@ -31,16 +29,14 @@ function startServer(){
 
 (async ()=>{
   const server = await startServer();
-  console.log(`server :${PORT}`);
   try {
     const browser = await chromium.launch();
-    // Wide banner-style aspect for a hero
-    const ctx = await browser.newContext({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
+    const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
-
     await page.goto(`http://localhost:${PORT}/asciidream.html`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(800);
-    // dismiss welcome
+
+    // Dismiss welcome
     await page.evaluate(()=>{
       document.querySelectorAll('.modal .actions button').forEach(b => {
         if (/got it/i.test(b.textContent)) b.click();
@@ -48,36 +44,44 @@ function startServer(){
     });
     await page.waitForTimeout(300);
 
-    // Load dino, then set a striking config: braille + vaporwave + edges
-    await page.evaluate(async ()=>{
-      const blob = await (await fetch('/_dino.png')).blob();
-      const file = new File([blob], 'img__00001_.png', { type:'image/png' });
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      window.dispatchEvent(new DragEvent('drop', { bubbles:true, cancelable:true, dataTransfer:dt }));
-    });
-    await page.waitForTimeout(1500);
-
-    // close the coach + tune the look
+    // Hero: full-canvas Voronoi cells in Turbo (rainbow), each cell a
+    // saturated colour from palette-random, every grid position filled.
     await page.evaluate(()=>{
       try { if (typeof closeCoach === 'function') closeCoach(); } catch(e){}
-      const L = STATE.project.layers[STATE.selectedLayer];
-      L.generatorParams.mode = 'density';
-      L.generatorParams.contrast = 1.25;
-      L.generatorParams.sampleColors = true;
-      STATE.project.selectedCharset = 'braille';
-      STATE.project.selectedPalette = 'vapor';
-      // Resize the canvas larger to fill the hero
-      STATE.project.canvas.cols = 200;
-      STATE.project.canvas.rows = 80;
+      const proj = STATE.project;
+      proj.canvas.cols = 280;
+      proj.canvas.rows = 110;
+      proj.selectedCharset = 'quadrants';
+      proj.selectedPalette = 'turbo';
+      proj.layers = [
+        Object.assign(defaultLayer('Cells', 'voronoi-stipple'), {
+          generatorParams: Object.assign(gen_defaultParams(GENS['voronoi-stipple']), {
+            points: 60, glyphPerCell: true
+          }),
+          seed: 23, blend: 'normal', opacity: 1, colorMode: 'palette-random'
+        }),
+        Object.assign(defaultLayer('Mandala', 'mandala'), {
+          generatorParams: Object.assign(gen_defaultParams(GENS['mandala']), {
+            folds: 14, scale: 0.05, layers: 3
+          }),
+          seed: 1, blend: 'multiply', opacity: 0.55, colorMode: 'palette-density'
+        })
+      ];
+      STATE.selectedLayer = 1;
       rebuildAll(); fitZoom(); scheduleRender();
     });
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(1200);
 
-    // Snap full window — gives us a 1600×900 hero
-    await page.screenshot({ path: path.join(OUT, '00-hero.png') });
-    const size = fs.statSync(path.join(OUT, '00-hero.png')).size;
-    console.log(`hero: ${(size/1024).toFixed(1)} KB`);
+    // Pull the rendered canvas at its NATIVE pixel resolution (every cell
+    // at full cellW × cellH). The viewport screenshot would downscale it.
+    const dataUrl = await page.evaluate(()=>{
+      const c = document.getElementById('preview');
+      return c.toDataURL('image/png');
+    });
+    const b64 = dataUrl.split(',')[1];
+    const buf = Buffer.from(b64, 'base64');
+    fs.writeFileSync(path.join(OUT, '00-hero.png'), buf);
+    console.log(`hero: ${(buf.length/1024).toFixed(1)} KB, ${buf.length} bytes`);
 
     await browser.close();
   } finally {

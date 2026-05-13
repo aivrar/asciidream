@@ -1286,7 +1286,7 @@ function colorize(ctx, density, idx=0){
     case 'two-tone':         return density>0.5 ? palette[palette.length-1] : palette[0];
     case 'palette-density':  return Col.sample(palette, density);
     case 'palette-random':   return Col.index(palette, Math.floor(idx) || Math.floor(density*1000));
-    case 'palette-by-pos':   return Col.sample(palette, ((idx>>16)/(ctx.cols*ctx.rows))%1);
+    case 'palette-by-pos':   return Col.sample(palette, (idx / (ctx.cols * ctx.rows)) % 1);
     default:                 return Col.sample(palette, density);
   }
 }

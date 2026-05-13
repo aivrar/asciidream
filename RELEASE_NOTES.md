@@ -1,3 +1,14 @@
+## Asciidream v1.0.1 — Palette-by-position bug fix
+
+Quick patch:
+
+- **Fix**: `palette-by-pos` colour mode was using `idx >> 16` which collapsed to 0 for any realistic canvas size, so palette-by-pos always rendered as `palette[0]` (typically black). Now correctly spreads colours across positions.
+- **Refresh**: regenerated all README / wiki screenshots with the fix in place — colour-by-position now looks vibrant.
+
+Everything from v1.0.0 still applies; see below.
+
+---
+
 ## Asciidream v1.0.0 — Initial release
 
 Single-file portable Windows executable. Download `Asciidream.exe`, double-click, no install.
